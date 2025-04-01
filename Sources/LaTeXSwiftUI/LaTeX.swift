@@ -68,6 +68,11 @@ public struct LaTeX: View {
         var textColor: Color
         
         public static let general: Configuration = .init(formulaColor: .white, textColor: .white)
+        
+        public init(formulaColor: Color, textColor: Color) {
+            self.formulaColor = formulaColor
+            self.textColor = textColor
+        }
     }
     
     /// The view's error mode.
