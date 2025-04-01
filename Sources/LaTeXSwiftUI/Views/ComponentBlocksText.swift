@@ -27,69 +27,73 @@ import SwiftUI
 
 /// Displays a component block as a text view.
 internal struct ComponentBlocksText: View {
-  
-  /// The component blocks to display in the view.
-  let blocks: [ComponentBlock]
-  
-  /// Whether inline mode should be forced.
-  var forceInline: Bool = false
-  
-  // MARK: Private properties
-  
-  /// The rendering mode to use with the rendered MathJax images.
-  @Environment(\.imageRenderingMode) private var imageRenderingMode
-  
-  /// What to do in the case of an error.
-  @Environment(\.errorMode) private var errorMode
-  
-  /// The view's font.
-  @Environment(\.font) private var font
-  
-  /// The view's current display scale.
-  @Environment(\.displayScale) private var displayScale
-  
-  /// The view's block rendering mode.
-  @Environment(\.blockMode) private var blockMode
-  
-  /// Whether string formatting such as markdown should be ignored or rendered.
-  @Environment(\.ignoreStringFormatting) private var ignoreStringFormatting
-  
-  // MARK: View body
-  
-  var body: some View {
-    blocks.map { block in
-      return block.isEquationBlock && !forceInline ?
-      Text("\n") + text(for: block) + Text("\n") :
-      text(for: block)
-    }.reduce(Text(""), +)
-  }
-  
+    
+    let configuration: LaTeX.Configuration
+    
+    /// The component blocks to display in the view.
+    let blocks: [ComponentBlock]
+    
+    /// Whether inline mode should be forced.
+    var forceInline: Bool = false
+    
+    // MARK: Private properties
+    
+    /// The rendering mode to use with the rendered MathJax images.
+    @Environment(\.imageRenderingMode) private var imageRenderingMode
+    
+    /// What to do in the case of an error.
+    @Environment(\.errorMode) private var errorMode
+    
+    /// The view's font.
+    @Environment(\.font) private var font
+    
+    /// The view's current display scale.
+    @Environment(\.displayScale) private var displayScale
+    
+    /// The view's block rendering mode.
+    @Environment(\.blockMode) private var blockMode
+    
+    /// Whether string formatting such as markdown should be ignored or rendered.
+    @Environment(\.ignoreStringFormatting) private var ignoreStringFormatting
+    
+    // MARK: View body
+    
+    var body: some View {
+        blocks.map { block in
+            return block.isEquationBlock && !forceInline ?
+            Text("\n") + text(for: block) + Text("\n") :
+            text(for: block)
+        }.reduce(Text(""), +)
+    }
+    
 }
 
 // MARK: Private methods
 
 extension ComponentBlocksText {
-  
-  /// Gets the `Text` view for the given component block.
-  ///
-  /// - Parameter block: The component block.
-  /// - Returns: A `Text` view.
-  @MainActor private func text(for block: ComponentBlock) -> Text {
-    block.toText(
-      font: font,
-      displayScale: displayScale,
-      renderingMode: imageRenderingMode,
-      errorMode: errorMode,
-      blockRenderingMode: blockMode,
-      ignoreStringFormatting: ignoreStringFormatting)
-  }
-  
+    
+    /// Gets the `Text` view for the given component block.
+    ///
+    /// - Parameter block: The component block.
+    /// - Returns: A `Text` view.
+    @MainActor private func text(for block: ComponentBlock) -> Text {
+        block.toText(
+            font: font,
+            formulaColor: configuration.formulaColor,
+            textColor: configuration.textColor,
+            displayScale: displayScale,
+            renderingMode: imageRenderingMode,
+            errorMode: errorMode,
+            blockRenderingMode: blockMode,
+            ignoreStringFormatting: ignoreStringFormatting)
+    }
+    
 }
 
 struct ComponentBlocksTextPreviews: PreviewProvider {
-  static var previews: some View {
-    ComponentBlocksText(blocks: [ComponentBlock(components: [
-      Component(text: "Hello, World!", type: .text)
-    ])], forceInline: false)
-  }
+    static var previews: some View {
+        ComponentBlocksText(configuration: .general, blocks: [ComponentBlock(components: [
+            Component(text: "Hello, World!", type: .text)
+        ])], forceInline: false)
+    }
 }

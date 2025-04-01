@@ -56,36 +56,39 @@ internal struct ComponentBlock: Hashable, Identifiable {
 }
 
 extension ComponentBlock {
-  
-  /// Converts a component block to a `Text` view.
-  ///
-  /// - Parameters:
-  ///   - font: The font to use.
-  ///   - displayScale: The display scale.
-  ///   - renderingMode: The rendering mode.
-  ///   - errorMode: The error mode.
-  ///   - blockRenderingMode: The block rendering mode.
-  ///   - ignoreStringFormatting: Whether string formatting such as markdown
-  ///     should be ignored or rendered.
-  /// - Returns: A `Text` view.
-  @MainActor func toText(
-    font: Font?,
-    displayScale: CGFloat,
-    renderingMode: Image.TemplateRenderingMode,
-    errorMode: LaTeX.ErrorMode,
-    blockRenderingMode: LaTeX.BlockMode,
-    ignoreStringFormatting: Bool
-  ) -> Text {
-    components.enumerated().map { i, component in
-      return component.convertToText(
-        font: font ?? .body,
-        displayScale: displayScale,
-        renderingMode: renderingMode,
-        errorMode: errorMode,
-        blockRenderingMode: blockRenderingMode,
-        isInEquationBlock: isEquationBlock,
-        ignoreStringFormatting: ignoreStringFormatting)
-    }.reduce(Text(""), +)
-  }
-  
+    
+    /// Converts a component block to a `Text` view.
+    ///
+    /// - Parameters:
+    ///   - font: The font to use.
+    ///   - displayScale: The display scale.
+    ///   - renderingMode: The rendering mode.
+    ///   - errorMode: The error mode.
+    ///   - blockRenderingMode: The block rendering mode.
+    ///   - ignoreStringFormatting: Whether string formatting such as markdown
+    ///     should be ignored or rendered.
+    /// - Returns: A `Text` view.
+    @MainActor func toText(
+        font: Font?,
+        formulaColor: Color,
+        textColor: Color,
+        displayScale: CGFloat,
+        renderingMode: Image.TemplateRenderingMode,
+        errorMode: LaTeX.ErrorMode,
+        blockRenderingMode: LaTeX.BlockMode,
+        ignoreStringFormatting: Bool
+    ) -> Text {
+        components.enumerated().map { i, component in
+            return component.convertToText(
+                font: font ?? .body,
+                formulaColor: formulaColor,
+                textColor: textColor,
+                displayScale: displayScale,
+                renderingMode: renderingMode,
+                errorMode: errorMode,
+                blockRenderingMode: blockRenderingMode,
+                isInEquationBlock: isEquationBlock,
+                ignoreStringFormatting: ignoreStringFormatting)
+        }.reduce(Text(""), +)
+    }
 }

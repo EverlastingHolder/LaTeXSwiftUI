@@ -188,86 +188,87 @@ internal struct Component: CustomStringConvertible, Equatable, Hashable {
 }
 
 extension Component {
-  
-  /// Converts the component to a `Text` view.
-  ///
-  /// - Parameters:
-  ///   - font: The font to use.
-  ///   - displayScale: The view's display scale.
-  ///   - renderingMode: The image rendering mode.
-  ///   - errorMode: The error handling mode.
-  ///   - blockRenderingModel: The rendering mode of the block.
-  ///   - isInEquationBlock: Whether this block is in an equation block.
-  ///   - ignoreStringFormatting: Whether string formatting such as markdown
-  ///     should be ignored or rendered.
-  /// - Returns: A text view.
-  func convertToText(
-    font: Font,
-    displayScale: CGFloat,
-    renderingMode: SwiftUI.Image.TemplateRenderingMode,
-    errorMode: LaTeX.ErrorMode,
-    blockRenderingMode: LaTeX.BlockMode,
-    isInEquationBlock: Bool,
-    ignoreStringFormatting: Bool
-  ) -> Text {
-    // Get the component's text
-    let text: Text
-    if let svg = svg {
-      // Do we have an error?
-      if let errorText = svg.errorText, errorMode != .rendered {
-        switch errorMode {
-        case .original:
-          // Use the original tex input
-          text = Text(blockRenderingMode == .alwaysInline ? originalTextTrimmingNewlines : originalText)
-        case .error:
-          // Use the error text
-          text = Text(errorText)
-        default:
-          text = Text("")
+    
+    /// Converts the component to a `Text` view.
+    ///
+    /// - Parameters:
+    ///   - font: The font to use.
+    ///   - displayScale: The view's display scale.
+    ///   - renderingMode: The image rendering mode.
+    ///   - errorMode: The error handling mode.
+    ///   - blockRenderingModel: The rendering mode of the block.
+    ///   - isInEquationBlock: Whether this block is in an equation block.
+    ///   - ignoreStringFormatting: Whether string formatting such as markdown
+    ///     should be ignored or rendered.
+    /// - Returns: A text view.
+    func convertToText(
+        font: Font,
+        formulaColor: Color,
+        textColor: Color,
+        displayScale: CGFloat,
+        renderingMode: SwiftUI.Image.TemplateRenderingMode,
+        errorMode: LaTeX.ErrorMode,
+        blockRenderingMode: LaTeX.BlockMode,
+        isInEquationBlock: Bool,
+        ignoreStringFormatting: Bool
+    ) -> Text {
+        // Get the component's text
+        let text: Text
+        if let svg = svg {
+            // Do we have an error?
+            if let errorText = svg.errorText, errorMode != .rendered {
+                switch errorMode {
+                case .original:
+                    // Use the original tex input
+                    text = Text(blockRenderingMode == .alwaysInline ? originalTextTrimmingNewlines : originalText)
+                case .error:
+                    // Use the error text
+                    text = Text(errorText)
+                default:
+                    text = Text("")
+                }
+            }
+            else if let imageContainer {
+                let xHeight = _Font.preferredFont(from: font).xHeight
+                let offset = svg.geometry.verticalAlignment.toPoints(xHeight)
+                text = Text(imageContainer.image.renderingMode(.template)).baselineOffset(blockRenderingMode == .alwaysInline || !isInEquationBlock ? offset : 0)
+            }
+            else {
+                text = Text("")
+            }
         }
-      }
-      else if let imageContainer {
-        let xHeight = _Font.preferredFont(from: font).xHeight
-        let offset = svg.geometry.verticalAlignment.toPoints(xHeight)
-        text = Text(imageContainer.image).baselineOffset(blockRenderingMode == .alwaysInline || !isInEquationBlock ? offset : 0)
-      }
-      else {
-        text = Text("")
-      }
-    }
-    else if blockRenderingMode == .alwaysInline {
-      text = formattedText(input: originalTextTrimmingNewlines, ignoreStringFormatting: ignoreStringFormatting)
-    }
-    else {
-      text = formattedText(input: originalText, ignoreStringFormatting: ignoreStringFormatting)
+        else if blockRenderingMode == .alwaysInline {
+            text = formattedText(input: originalTextTrimmingNewlines, ignoreStringFormatting: ignoreStringFormatting)
+        }
+        else {
+            text = formattedText(input: originalText, ignoreStringFormatting: ignoreStringFormatting)
+        }
+        
+        return text.foregroundColor(type == .text ? textColor : formulaColor)
     }
     
-    return text
-  }
-  
-  /// Formats the input text and returns a text view.
-  ///
-  /// - Parameters:
-  ///   - input: The plaintext to format.
-  ///   - ignoreStringFormatting: Whether the method should ignore formatting.
-  /// - Returns: A text view.
-  func formattedText(input: String, ignoreStringFormatting: Bool) -> Text {
-    if ignoreStringFormatting {
-      return Text(input)
+    /// Formats the input text and returns a text view.
+    ///
+    /// - Parameters:
+    ///   - input: The plaintext to format.
+    ///   - ignoreStringFormatting: Whether the method should ignore formatting.
+    /// - Returns: A text view.
+    func formattedText(input: String, ignoreStringFormatting: Bool) -> Text {
+        if ignoreStringFormatting {
+            return Text(input)
+        }
+        else {
+            do {
+                return Text(try AttributedString(
+                    markdown: input,
+                    options: AttributedString.MarkdownParsingOptions(
+                        allowsExtendedAttributes: true,
+                        interpretedSyntax: .inlineOnlyPreservingWhitespace,
+                        failurePolicy: .returnPartiallyParsedIfPossible)))
+            }
+            catch {
+                return Text(input)
+            }
+        }
     }
-    else {
-      do {
-        return Text(try AttributedString(
-          markdown: input,
-          options: AttributedString.MarkdownParsingOptions(
-            allowsExtendedAttributes: true,
-            interpretedSyntax: .inlineOnlyPreservingWhitespace,
-            failurePolicy: .returnPartiallyParsedIfPossible)))
-      }
-      catch {
-        return Text(input)
-      }
-    }
-  }
-  
 }
