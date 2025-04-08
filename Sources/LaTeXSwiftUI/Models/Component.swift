@@ -260,7 +260,8 @@ extension Component {
         else {
             do {
                 var input = input
-                if input.hasPrefix("**"), !input.hasSuffix("**") {
+                let count = input.count(where: { $0 == Character("**") })
+                if count % 2 != 0 {
                     input.append(contentsOf: "**")
                 }
                 return Text(try AttributedString(
