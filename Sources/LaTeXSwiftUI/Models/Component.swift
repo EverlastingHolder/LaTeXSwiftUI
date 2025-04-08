@@ -260,9 +260,13 @@ extension Component {
         else {
             do {
                 var input = input
-                let count = input.count(where: { $0 == "*" }) / 2
-                if count % 2 != 0 {
+                let count = input.count(where: { $0 == "*" })
+                if (count / 2) % 2 != 0 {
                     input.append(contentsOf: "**")
+                }
+                
+                if count == 2 {
+                    input.insert(contentsOf: "**", at: input.startIndex)
                 }
                 return Text(try AttributedString(
                     markdown: input,
