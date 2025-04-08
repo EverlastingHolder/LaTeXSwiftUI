@@ -260,9 +260,10 @@ extension Component {
         else {
             do {
                 var input = input
-                let count = input.count(where: { $0 == "*" })
+                var count = input.count(where: { $0 == "*" })
                 if count == 2 {
                     input.insert(contentsOf: "**", at: input.startIndex)
+                    count = input.count(where: { $0 == "*" })
                 }
                 if (count / 2) % 2 != 0 {
                     input.append(contentsOf: "**")
