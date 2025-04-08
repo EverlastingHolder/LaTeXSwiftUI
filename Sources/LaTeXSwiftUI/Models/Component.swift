@@ -259,6 +259,10 @@ extension Component {
         }
         else {
             do {
+                var input = input
+                if input.hasPrefix("**"), !input.hasSuffix("**") {
+                    input.append(contentsOf: "**")
+                }
                 return Text(try AttributedString(
                     markdown: input,
                     options: AttributedString.MarkdownParsingOptions(
