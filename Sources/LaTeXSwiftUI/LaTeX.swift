@@ -313,7 +313,7 @@ extension LaTeX {
         case .blockText:
             ComponentBlocksText(configuration: configuration, blocks: blocks)
         case .blockViews:
-            ComponentBlocksText(configuration: configuration, blocks: blocks)
+            ComponentBlocksViews(configuration: configuration, blocks: blocks)
         }
     }
     
