@@ -260,7 +260,7 @@ extension Component {
         else {
             do {
                 var input = input
-                let count = input.count(where: { $0 == Character("**") })
+                let count = input.count(where: { $0.description == "**" })
                 if count % 2 != 0 {
                     input.append(contentsOf: "**")
                 }
