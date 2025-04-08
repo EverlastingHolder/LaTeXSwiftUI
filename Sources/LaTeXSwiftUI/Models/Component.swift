@@ -259,15 +259,6 @@ extension Component {
         }
         else {
             do {
-                var input = input
-                var count = input.count(where: { $0 == "*" })
-                if count == 2 {
-                    input.insert(contentsOf: "**", at: input.startIndex)
-                    count = input.count(where: { $0 == "*" })
-                }
-                if (count / 2) % 2 != 0 {
-                    input.append(contentsOf: "**")
-                }
                 return Text(try AttributedString(
                     markdown: input,
                     options: AttributedString.MarkdownParsingOptions(
